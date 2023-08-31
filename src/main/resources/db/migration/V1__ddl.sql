@@ -5,6 +5,7 @@ CREATE TABLE album
     spotify_id      VARCHAR(255),
     total_tracks    INT,
     artist_id       UUID,
+    fetch_flag      BOOlEAN,
     PRIMARY KEY (id)
 );
 
@@ -14,6 +15,7 @@ CREATE TABLE artist
     name            VARCHAR(255),
     spotify_id      VARCHAR(255),
     popularity      INT,
+    fetch_flag      BOOlEAN,
     PRIMARY KEY (id)
 );
 
