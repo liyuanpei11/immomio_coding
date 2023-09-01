@@ -1,5 +1,8 @@
 package com.example.immomio_coding.spotify;
 
+import com.example.immomio_coding.dao.AlbumDAO;
+import com.example.immomio_coding.dao.ArtistDAO;
+import com.example.immomio_coding.entities.Artist;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.*;
@@ -21,6 +24,13 @@ public class SpotifyAPI {
     private LocalDateTime acquireDateTime;
     private int expireTime;
     private HttpEntity httpEntity;
+    private ArtistDAO artistDAO;
+    private AlbumDAO albumDAO;
+
+    public SpotifyAPI(AlbumDAO albumDAO, ArtistDAO artistDAO) {
+        this.albumDAO = albumDAO;
+        this.artistDAO = artistDAO;
+    }
 
     private void getAccessToken() {
         String url = "https://accounts.spotify.com/api/token";
@@ -79,13 +89,38 @@ public class SpotifyAPI {
         RestTemplate restTemplate = new RestTemplate();
 
         try {
-            ResponseEntity<String> spotifyData = restTemplate.exchange(
+            ResponseEntity<JsonNode> spotifyData = restTemplate.exchange(
                     urlTemplate,
                     HttpMethod.GET,
                     this.httpEntity,
-                    String.class
+                    JsonNode.class
                     );
-            System.out.println(spotifyData);
+
+            for (JsonNode spotifyArtist :
+                    Objects.requireNonNull(spotifyData.getBody()).get("artists")) {
+//                System.out.println("Künstler: " + spotifyArtist.get("name"));
+//                System.out.println("Spotify ID: " + spotifyArtist.get("id"));
+//                System.out.println("popularity: " + spotifyArtist.get("popularity"));
+//                System.out.println("Fetch flag: " + true);
+                Artist dbArtist = artistDAO.findBySpotifyId(spotifyArtist.get("id").toString());
+                System.out.println("getting artist from db:");
+                System.out.println(dbArtist);
+                if (dbArtist == null) {
+                    System.out.println("creating a new artist");
+                    Artist newArtist = new Artist();
+                    newArtist.setName(spotifyArtist.get("name").toString());
+                    newArtist.setSpotifyId(spotifyArtist.get("id").toString());
+                    newArtist.setPopularity(spotifyArtist.get("popularity").intValue());
+                    newArtist.setFetchFlag(true);
+                    artistDAO.save(newArtist);
+                } else if (dbArtist.isFetchFlag()) {
+                    System.out.println("fetching existing artist");
+                    dbArtist.setName(spotifyArtist.get("name").toString());
+                    dbArtist.setSpotifyId(spotifyArtist.get("id").toString());
+                    dbArtist.setPopularity(spotifyArtist.get("popularity").intValue());
+                    artistDAO.save(dbArtist);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
