@@ -1,12 +1,8 @@
 package com.example.immomio_coding.spotify;
 
-import com.example.immomio_coding.dao.AlbumDAO;
-import com.example.immomio_coding.dao.ArtistDAO;
-import com.example.immomio_coding.entities.Artist;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.*;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -15,24 +11,19 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Component
 public class SpotifyAPI {
 
-    private String accessToken;
-    private LocalDateTime acquireDateTime;
-    private int expireTime;
-    private HttpEntity httpEntity;
-    private ArtistDAO artistDAO;
-    private AlbumDAO albumDAO;
+    String accessToken;
+    LocalDateTime acquireDateTime;
+    int expireTime;
+    HttpEntity httpEntity;
 
-    public SpotifyAPI(AlbumDAO albumDAO, ArtistDAO artistDAO) {
-        this.albumDAO = albumDAO;
-        this.artistDAO = artistDAO;
-    }
-
-    private void getAccessToken() {
+    void generateAccessToken() {
         String url = "https://accounts.spotify.com/api/token";
 
         RestTemplate restTemplate = new RestTemplate();
@@ -66,66 +57,6 @@ public class SpotifyAPI {
         }
     }
 
-    @Scheduled(fixedRate = 10000)
-    public void fetchSpotifyArtists() {
-
-        List<String> artistsIdList = getArtistsIdList();
-
-        String url = "https://api.spotify.com/v1/artists";
-
-        //TODO: make params better
-        String urlTemplate = UriComponentsBuilder.fromHttpUrl(url)
-                .queryParam("ids", String.join(",", artistsIdList))
-                .encode()
-                .toUriString();
-
-        //TODO: maybe SpringBoot has a function for this
-        if (this.accessToken == null ||
-                ChronoUnit.SECONDS.between(Objects.requireNonNull(this.acquireDateTime), LocalDateTime.now()) >= this.expireTime) {
-            System.out.println("getting a new token");
-            this.getAccessToken();
-        }
-
-        RestTemplate restTemplate = new RestTemplate();
-
-        try {
-            ResponseEntity<JsonNode> spotifyData = restTemplate.exchange(
-                    urlTemplate,
-                    HttpMethod.GET,
-                    this.httpEntity,
-                    JsonNode.class
-                    );
-
-            for (JsonNode spotifyArtist :
-                    Objects.requireNonNull(spotifyData.getBody()).get("artists")) {
-//                System.out.println("Künstler: " + spotifyArtist.get("name"));
-//                System.out.println("Spotify ID: " + spotifyArtist.get("id"));
-//                System.out.println("popularity: " + spotifyArtist.get("popularity"));
-//                System.out.println("Fetch flag: " + true);
-                Artist dbArtist = artistDAO.findBySpotifyId(spotifyArtist.get("id").toString());
-                System.out.println("getting artist from db:");
-                System.out.println(dbArtist);
-                if (dbArtist == null) {
-                    System.out.println("creating a new artist");
-                    Artist newArtist = new Artist();
-                    newArtist.setName(spotifyArtist.get("name").toString());
-                    newArtist.setSpotifyId(spotifyArtist.get("id").toString());
-                    newArtist.setPopularity(spotifyArtist.get("popularity").intValue());
-                    newArtist.setFetchFlag(true);
-                    artistDAO.save(newArtist);
-                } else if (dbArtist.isFetchFlag()) {
-                    System.out.println("fetching existing artist");
-                    dbArtist.setName(spotifyArtist.get("name").toString());
-                    dbArtist.setSpotifyId(spotifyArtist.get("id").toString());
-                    dbArtist.setPopularity(spotifyArtist.get("popularity").intValue());
-                    artistDAO.save(dbArtist);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public void fetchSpotifyAlbums(String artistId) {
         String url = String.format("https://api.spotify.com/v1/artists/%s/albums", artistId);
 
@@ -141,7 +72,7 @@ public class SpotifyAPI {
         if (this.accessToken == null ||
                 ChronoUnit.SECONDS.between(Objects.requireNonNull(this.acquireDateTime), LocalDateTime.now()) >= this.expireTime) {
             System.out.println("getting a new token");
-            this.getAccessToken();
+            this.generateAccessToken();
         }
 
         RestTemplate restTemplate = new RestTemplate();
@@ -159,9 +90,7 @@ public class SpotifyAPI {
         }
     }
 
-
-
-    private static List<String> getArtistsIdList() {
+    static List<String> getArtistsIdList() {
         List<String> artistsIdList = new ArrayList<>();
         artistsIdList.add("4UXqAaa6dQYAk18Lv7PEgX"); // Fall Out Boy
         artistsIdList.add("378dH6EszOLFShpRzAQkVM"); // Lindsey Stirling
