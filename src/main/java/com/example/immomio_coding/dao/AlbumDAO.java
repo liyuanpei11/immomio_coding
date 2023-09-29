@@ -5,4 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.UUID;
 
-public interface AlbumDAO extends CrudRepository<Album, UUID> {}
+public interface AlbumDAO extends CrudRepository<Album, UUID> {
+
+    Album findBySpotifyId(String spotifyId);
+}
