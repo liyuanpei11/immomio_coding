@@ -1,1 +1,14 @@
+### new get
 GET http://localhost:8080/artists/43cddacb-0a28-4d08-ae54-d64d3920c20b
+
+### create new artist
+POST http://localhost:8080/artists/create
+Content-Type: application/json
+
+{
+    "name": "testing artist create",
+    "spotifyId": "bla bla bla",
+    "popularity": 100,
+    "fetchFlag": true
+}
+
