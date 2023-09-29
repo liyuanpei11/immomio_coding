@@ -5,7 +5,7 @@ import com.example.immomio_coding.entities.Artist;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -14,17 +14,14 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 
+@Component
 public class SpotifyArtists extends SpotifyAPI {
     ArtistDAO artistDAO;
     public SpotifyArtists(ArtistDAO artistDAO) {
-        super();
         this.artistDAO = artistDAO;
     }
 
-    @Scheduled(fixedRate = 10000)
-    public void fetchSpotifyArtists() {
-        List<String> artistsIdList = getArtistsIdList();
-
+    public void fetchSpotifyArtists(List<String> artistsIdList) {
         String url = "https://api.spotify.com/v1/artists";
 
         //TODO: make params better
@@ -52,15 +49,15 @@ public class SpotifyArtists extends SpotifyAPI {
 
             for (JsonNode spotifyAPIArtist :
                     Objects.requireNonNull(spotifyData.getBody()).get("artists")) {
-                Artist dbArtist = artistDAO.findBySpotifyId(spotifyAPIArtist.get("id").toString());
                 System.out.println("getting artist from db:");
+                Artist dbArtist = artistDAO.findBySpotifyId(spotifyAPIArtist.get("id").textValue());
                 System.out.println(dbArtist);
                 if (dbArtist == null) {
                     System.out.println("creating a new artist");
-                    artistDAO.save(fetchSpotifyArtist(new Artist(), spotifyAPIArtist));
+                    artistDAO.save(updateArtist(new Artist(), spotifyAPIArtist));
                 } else if (dbArtist.isFetchFlag()) {
                     System.out.println("fetching existing artist");
-                    artistDAO.save(fetchSpotifyArtist(dbArtist, spotifyAPIArtist));
+                    artistDAO.save(updateArtist(dbArtist, spotifyAPIArtist));
                 }
             }
         } catch (Exception e) {
@@ -68,9 +65,9 @@ public class SpotifyArtists extends SpotifyAPI {
         }
     }
 
-    private Artist fetchSpotifyArtist(Artist dbArtist, JsonNode spotifyAPIArtist) {
-        dbArtist.setName(spotifyAPIArtist.get("name").toString());
-        dbArtist.setSpotifyId(spotifyAPIArtist.get("id").toString());
+    private Artist updateArtist(Artist dbArtist, JsonNode spotifyAPIArtist) {
+        dbArtist.setName(spotifyAPIArtist.get("name").textValue());
+        dbArtist.setSpotifyId(spotifyAPIArtist.get("id").textValue());
         dbArtist.setPopularity(spotifyAPIArtist.get("popularity").intValue());
         dbArtist.setFetchFlag(true);
         return dbArtist;
