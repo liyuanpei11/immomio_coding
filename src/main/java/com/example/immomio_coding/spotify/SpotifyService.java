@@ -19,13 +19,15 @@ public class SpotifyService {
         this.artistDAO = artistDAO;
     }
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 100000000)
     public void fetchArtistsList() {
+        System.out.println("Start fetching data from spotify");
         List<String> artistsIdList = getArtistsIdList();
         spotifyArtists.fetchSpotifyArtists(artistsIdList);
         for (String artistId : artistsIdList) {
             spotifyAlbums.fetchSpotifyArtistAlbums(artistId);
         }
+        System.out.println("Fetching data from spotify done!!!");
     }
 
     private List<String> getArtistsIdList() {

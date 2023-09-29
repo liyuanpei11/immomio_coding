@@ -33,7 +33,6 @@ public class SpotifyArtists extends SpotifyAPI {
         //TODO: maybe SpringBoot has a function for this
         if (this.accessToken == null ||
                 ChronoUnit.SECONDS.between(Objects.requireNonNull(this.acquireDateTime), LocalDateTime.now()) >= this.expireTime) {
-            System.out.println("getting a new token");
             this.generateAccessToken();
         }
 
@@ -49,14 +48,10 @@ public class SpotifyArtists extends SpotifyAPI {
 
             for (JsonNode spotifyAPIArtist :
                     Objects.requireNonNull(spotifyData.getBody()).get("artists")) {
-                System.out.println("getting artist from db:");
                 Artist dbArtist = artistDAO.findBySpotifyId(spotifyAPIArtist.get("id").textValue());
-                System.out.println(dbArtist);
                 if (dbArtist == null) {
-                    System.out.println("creating a new artist");
                     artistDAO.save(updateArtist(new Artist(), spotifyAPIArtist));
                 } else if (dbArtist.isFetchFlag()) {
-                    System.out.println("fetching existing artist");
                     artistDAO.save(updateArtist(dbArtist, spotifyAPIArtist));
                 }
             }

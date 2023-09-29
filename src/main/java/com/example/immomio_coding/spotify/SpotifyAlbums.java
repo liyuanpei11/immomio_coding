@@ -27,8 +27,6 @@ public class SpotifyAlbums extends SpotifyAPI {
     public void fetchSpotifyArtistAlbums(String artistId) {
         String url = String.format("https://api.spotify.com/v1/artists/%s/albums", artistId);
 
-        System.out.println(url);
-
         //TODO: make params better
         String urlTemplate = UriComponentsBuilder.fromHttpUrl(url)
                 .queryParam("include_groups", "album")
@@ -38,7 +36,6 @@ public class SpotifyAlbums extends SpotifyAPI {
         //TODO: maybe SpringBoot has a function for this
         if (this.accessToken == null ||
                 ChronoUnit.SECONDS.between(Objects.requireNonNull(this.acquireDateTime), LocalDateTime.now()) >= this.expireTime) {
-            System.out.println("getting a new token");
             this.generateAccessToken();
         }
 
@@ -51,19 +48,13 @@ public class SpotifyAlbums extends SpotifyAPI {
                     this.httpEntity,
                     JsonNode.class
             );
-            System.out.println("GETTING ALBUM DATA RIGHT NOW YEAY");
-            System.out.println(spotifyData);
 
             for (JsonNode spotifyAPIArtistAlbum :
                     Objects.requireNonNull(spotifyData.getBody()).get("items")) {
-                System.out.println("getting album from db:");
                 Album dbAlbum = albumDAO.findBySpotifyId(spotifyAPIArtistAlbum.get("id").textValue());
-                System.out.println(dbAlbum);
                 if (dbAlbum == null) {
-                    System.out.println("creating new album");
                     albumDAO.save(updateAlbum(new Album(), spotifyAPIArtistAlbum, artistId));
                 } else if (dbAlbum.isFetchFlag()) {
-                    System.out.println("fetching existing album");
                     albumDAO.save(updateAlbum(dbAlbum, spotifyAPIArtistAlbum, artistId));
                 }
             }

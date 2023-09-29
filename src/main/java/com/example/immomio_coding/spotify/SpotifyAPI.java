@@ -41,9 +41,6 @@ public class SpotifyAPI {
             this.accessToken = root.path("access_token").asText();
             this.expireTime = root.path("expires_in").asInt();
             this.acquireDateTime = LocalDateTime.now();
-
-            System.out.println("Token is: " + this.accessToken);
-            System.out.println("expires in: " + this.expireTime);
             headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + this.accessToken);
             this.httpEntity = new HttpEntity<>(headers);
