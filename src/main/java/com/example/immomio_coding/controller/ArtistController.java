@@ -23,18 +23,18 @@ public class ArtistController {
     }
 
     @GetMapping("/{id}")
-    public Artist getArtistById(@PathVariable String id) {
-        return artistService.getArtistById(UUID.fromString(id));
+    public Artist getArtistById(@PathVariable UUID id) {
+        return artistService.getArtistById(id);
     }
 
     @PutMapping("/{id}")
-    public Artist updateArtist(@PathVariable String id, @RequestBody Artist updatedArtist) {
-        return artistService.updateArtist(UUID.fromString(id), updatedArtist);
+    public Artist updateArtist(@PathVariable UUID id, @RequestBody Artist updatedArtist) {
+        return artistService.updateArtist(id, updatedArtist);
     }
 
     @DeleteMapping("/{id}")
-    public Artist deleteArtist(@PathVariable String id) {
-        return artistService.deleteArtist(UUID.fromString(id));
+    public Artist deleteArtist(@PathVariable UUID id) {
+        return artistService.deleteArtist(id);
     }
 
     @PostMapping("/create")
