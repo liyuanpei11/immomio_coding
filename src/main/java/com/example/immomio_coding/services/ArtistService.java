@@ -4,9 +4,8 @@ import com.example.immomio_coding.dao.ArtistDAO;
 import com.example.immomio_coding.entities.Artist;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.security.InvalidParameterException;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class ArtistService {
@@ -20,22 +19,27 @@ public class ArtistService {
         return artistDAO.findAll();
     }
 
-    public Optional<Artist> getArtistById(String id) {
-        return artistDAO.findById(UUID.fromString(id));
+    public Artist getArtistById(UUID artistId) {
+        return artistDAO.findById(artistId).orElseThrow(InvalidParameterException::new);
     }
 
     public Artist createArtist(Artist newArtist) {
         return artistDAO.save(newArtist);
     }
 
-    public Artist updateArtist(String artistUUId, Artist updateArtist) {
-        Optional<Artist> optionalArtist = artistDAO.findById(UUID.fromString(artistUUId));
-        AtomicReference<Artist> dbArtist;
-        optionalArtist.ifPresent(artist -> {
-            artist.setName(updateArtist.getName());
-            artist.setPopularity(updateArtist.getPopularity());
-            artist.setSpotifyId(updateArtist.getSpotifyId());
-            dbArtist.set(artist);
-        });
+    public Artist updateArtist(UUID artistUUId, Artist updateArtist) {
+        Artist currentArtist = artistDAO.findById(artistUUId).orElseThrow(InvalidParameterException::new);
+        currentArtist.setName(updateArtist.getName());
+        currentArtist.setPopularity(updateArtist.getPopularity());
+        currentArtist.setSpotifyId(updateArtist.getSpotifyId());
+        currentArtist.setFetchFlag(false);
+        artistDAO.save(currentArtist);
+        return currentArtist;
+    }
+
+    public Artist deleteArtist(UUID artistUUID) {
+        Artist deletedArtist = artistDAO.findById(artistUUID).orElseThrow(InvalidParameterException::new);
+        artistDAO.deleteById(artistUUID);
+        return deletedArtist;
     }
 }

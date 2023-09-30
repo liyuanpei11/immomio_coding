@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("artists")
@@ -23,8 +23,18 @@ public class ArtistController {
     }
 
     @GetMapping("/{id}")
-    public Optional<Artist> getArtistById(@PathVariable String id) {
-        return artistService.getArtistById(id);
+    public Artist getArtistById(@PathVariable String id) {
+        return artistService.getArtistById(UUID.fromString(id));
+    }
+
+    @PutMapping("/{id}")
+    public Artist updateArtist(@PathVariable String id, @RequestBody Artist updatedArtist) {
+        return artistService.updateArtist(UUID.fromString(id), updatedArtist);
+    }
+
+    @DeleteMapping("/{id}")
+    public Artist deleteArtist(@PathVariable String id) {
+        return artistService.deleteArtist(UUID.fromString(id));
     }
 
     @PostMapping("/create")
@@ -37,11 +47,6 @@ public class ArtistController {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Provide correct Actor Id", ex);
         }
-    }
-
-    @PutMapping("/update/{id}")
-    public Artist updateArtist(@PathVariable String id, @RequestBody Artist updatedArtist) {
-        return
     }
 }
 
