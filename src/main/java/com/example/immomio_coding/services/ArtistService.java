@@ -5,6 +5,7 @@ import com.example.immomio_coding.entities.Artist;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -41,5 +42,9 @@ public class ArtistService {
         Artist deletedArtist = artistDAO.findById(artistUUID).orElseThrow(InvalidParameterException::new);
         artistDAO.deleteById(artistUUID);
         return deletedArtist;
+    }
+
+    public List<Artist> searchArtists(String query) {
+        return artistDAO.searchByContent(query);
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -47,6 +48,11 @@ public class ArtistController {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Provide correct Actor Id", ex);
         }
+    }
+
+    @GetMapping("/search")
+    public List<Artist> searchArtists(@RequestParam("query") String query) {
+        return artistService.searchArtists(query);
     }
 }
 
