@@ -5,11 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Album extends EntityWithUUID {
+public class Album {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
     private String name;
     @Column(name = "spotify_id", nullable = false, unique = true)
     private String spotifyId;
