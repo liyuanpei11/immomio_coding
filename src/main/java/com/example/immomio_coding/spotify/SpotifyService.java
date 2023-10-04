@@ -1,6 +1,6 @@
 package com.example.immomio_coding.spotify;
 
-import com.example.immomio_coding.dao.ArtistDAO;
+import com.example.immomio_coding.repositories.ArtistRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -11,14 +11,15 @@ import java.util.List;
 public class SpotifyService {
     private final SpotifyArtists spotifyArtists;
     private final SpotifyAlbums spotifyAlbums;
-    ArtistDAO artistDAO;
+    ArtistRepository artistRepository;
 
-    public SpotifyService(SpotifyArtists spotifyArtists, SpotifyAlbums spotifyAlbums, ArtistDAO artistDAO) {
+    public SpotifyService(SpotifyArtists spotifyArtists, SpotifyAlbums spotifyAlbums, ArtistRepository artistRepository) {
         this.spotifyArtists = spotifyArtists;
         this.spotifyAlbums = spotifyAlbums;
-        this.artistDAO = artistDAO;
+        this.artistRepository = artistRepository;
     }
 
+    //TODO: change schedule
     @Scheduled(fixedRate = 100000000)
     public void fetchArtistsList() {
         System.out.println("Start fetching data from spotify");

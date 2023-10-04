@@ -17,7 +17,7 @@ public class ArtistController {
     }
 
     @GetMapping
-    public Iterable<Artist> getAllArtists() {
+    public List<Artist> getAllArtists() {
         return artistService.getArtists();
     }
 

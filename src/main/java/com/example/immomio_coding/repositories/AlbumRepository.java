@@ -1,16 +1,17 @@
-package com.example.immomio_coding.dao;
+package com.example.immomio_coding.repositories;
 
 import com.example.immomio_coding.entities.Album;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-public interface AlbumDAO extends CrudRepository<Album, UUID> {
+public interface AlbumRepository extends JpaRepository<Album, UUID> {
 
-    Album findBySpotifyId(String spotifyId);
+    Optional<Album> findBySpotifyId(String spotifyId);
 
     @Query(
             value = "SELECT * FROM Album WHERE to_tsvector(" +

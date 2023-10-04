@@ -17,7 +17,7 @@ public class AlbumController {
     }
 
     @GetMapping
-    public Iterable<Album> getAllAlbums() {
+    public List<Album> getAllAlbums() {
         return albumService.getAlbums();
     }
 

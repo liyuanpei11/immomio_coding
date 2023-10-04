@@ -1,51 +1,50 @@
 package com.example.immomio_coding.services;
 
-import com.example.immomio_coding.dao.AlbumDAO;
 import com.example.immomio_coding.entities.Album;
+import com.example.immomio_coding.repositories.AlbumRepository;
 import org.springframework.stereotype.Service;
 
-import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class AlbumService {
-    private final AlbumDAO albumDAO;
+    private final AlbumRepository albumRepository;
 
-    public AlbumService(AlbumDAO albumDAO) {
-        this.albumDAO = albumDAO;
+    public AlbumService(AlbumRepository albumRepository) {
+        this.albumRepository = albumRepository;
     }
 
-    public Iterable<Album> getAlbums() {
-        return albumDAO.findAll();
+    public List<Album> getAlbums() {
+        return albumRepository.findAll();
     }
 
     public Album getAlbumById(UUID albumId) {
-        return albumDAO.findById(albumId).orElseThrow(InvalidParameterException::new);
+        return albumRepository.findById(albumId).orElseThrow();
     }
 
     public Album createAlbum(Album newAlbum) {
-        return albumDAO.save(newAlbum);
+        return albumRepository.save(newAlbum);
     }
 
     public Album updateAlbum(UUID albumId, Album updatedAlbum) {
-        Album currentAlbum = albumDAO.findById(albumId).orElseThrow(InvalidParameterException::new);
+        Album currentAlbum = albumRepository.findById(albumId).orElseThrow();
         currentAlbum.setName(updatedAlbum.getName());
         currentAlbum.setTotalTracks(updatedAlbum.getTotalTracks());
         currentAlbum.setSpotifyId(updatedAlbum.getSpotifyId());
         currentAlbum.setArtist(updatedAlbum.getArtist());
         currentAlbum.setFetchFlag(false);
-        albumDAO.save(currentAlbum);
+        albumRepository.save(currentAlbum);
         return currentAlbum;
     }
 
     public Album deleteAlbum(UUID albumId) {
-        Album deletedAlbum = albumDAO.findById(albumId).orElseThrow(InvalidParameterException::new);
-        albumDAO.deleteById(albumId);
+        Album deletedAlbum = albumRepository.findById(albumId).orElseThrow();
+        albumRepository.deleteById(albumId);
         return deletedAlbum;
     }
 
     public List<Album> searchAlbums(String query) {
-        return albumDAO.searchByContent(query);
+        return albumRepository.searchByContent(query);
     }
 }

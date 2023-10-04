@@ -1,6 +1,6 @@
 package com.example.immomio_coding.spotify;
 
-import com.example.immomio_coding.dao.ArtistDAO;
+import com.example.immomio_coding.repositories.ArtistRepository;
 import com.example.immomio_coding.entities.Artist;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.http.HttpMethod;
@@ -13,12 +13,13 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Component
 public class SpotifyArtists extends SpotifyAPI {
-    ArtistDAO artistDAO;
-    public SpotifyArtists(ArtistDAO artistDAO) {
-        this.artistDAO = artistDAO;
+    ArtistRepository artistRepository;
+    public SpotifyArtists(ArtistRepository artistRepository) {
+        this.artistRepository = artistRepository;
     }
 
     public void fetchSpotifyArtists(List<String> artistsIdList) {
@@ -48,11 +49,11 @@ public class SpotifyArtists extends SpotifyAPI {
 
             for (JsonNode spotifyAPIArtist :
                     Objects.requireNonNull(spotifyData.getBody()).get("artists")) {
-                Artist dbArtist = artistDAO.findBySpotifyId(spotifyAPIArtist.get("id").textValue());
-                if (dbArtist == null) {
-                    artistDAO.save(updateArtist(new Artist(), spotifyAPIArtist));
-                } else if (dbArtist.isFetchFlag()) {
-                    artistDAO.save(updateArtist(dbArtist, spotifyAPIArtist));
+                Optional<Artist> dbArtist = artistRepository.findBySpotifyId(spotifyAPIArtist.get("id").textValue());
+                if (dbArtist.isEmpty()) {
+                    artistRepository.save(updateArtist(new Artist(), spotifyAPIArtist));
+                } else if (dbArtist.get().isFetchFlag()) {
+                    artistRepository.save(updateArtist(dbArtist.get(), spotifyAPIArtist));
                 }
             }
         } catch (Exception e) {

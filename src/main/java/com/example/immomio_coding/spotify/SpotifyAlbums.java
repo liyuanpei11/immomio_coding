@@ -1,7 +1,7 @@
 package com.example.immomio_coding.spotify;
 
-import com.example.immomio_coding.dao.AlbumDAO;
-import com.example.immomio_coding.dao.ArtistDAO;
+import com.example.immomio_coding.repositories.AlbumRepository;
+import com.example.immomio_coding.repositories.ArtistRepository;
 import com.example.immomio_coding.entities.Album;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.http.HttpMethod;
@@ -13,15 +13,16 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.Optional;
 
 @Component
 public class SpotifyAlbums extends SpotifyAPI {
-    AlbumDAO albumDAO;
-    ArtistDAO artistDAO;
+    AlbumRepository albumRepository;
+    ArtistRepository artistRepository;
 
-    public SpotifyAlbums(AlbumDAO albumDAO, ArtistDAO artistDAO) {
-        this.albumDAO = albumDAO;
-        this.artistDAO = artistDAO;
+    public SpotifyAlbums(AlbumRepository albumRepository, ArtistRepository artistRepository) {
+        this.albumRepository = albumRepository;
+        this.artistRepository = artistRepository;
     }
 
     public void fetchSpotifyArtistAlbums(String artistId) {
@@ -51,11 +52,11 @@ public class SpotifyAlbums extends SpotifyAPI {
 
             for (JsonNode spotifyAPIArtistAlbum :
                     Objects.requireNonNull(spotifyData.getBody()).get("items")) {
-                Album dbAlbum = albumDAO.findBySpotifyId(spotifyAPIArtistAlbum.get("id").textValue());
-                if (dbAlbum == null) {
-                    albumDAO.save(updateAlbum(new Album(), spotifyAPIArtistAlbum, artistId));
-                } else if (dbAlbum.isFetchFlag()) {
-                    albumDAO.save(updateAlbum(dbAlbum, spotifyAPIArtistAlbum, artistId));
+                Optional<Album> dbAlbum = albumRepository.findBySpotifyId(spotifyAPIArtistAlbum.get("id").textValue());
+                if (dbAlbum.isEmpty()) {
+                    albumRepository.save(updateAlbum(new Album(), spotifyAPIArtistAlbum, artistId));
+                } else if (dbAlbum.get().isFetchFlag()) {
+                    albumRepository.save(updateAlbum(dbAlbum.get(), spotifyAPIArtistAlbum, artistId));
                 }
             }
         } catch (Exception e) {
@@ -67,7 +68,7 @@ public class SpotifyAlbums extends SpotifyAPI {
         album.setName(spotifyAPIAlbum.get("name").textValue());
         album.setSpotifyId(spotifyAPIAlbum.get("id").textValue());
         album.setTotalTracks(spotifyAPIAlbum.get("total_tracks").intValue());
-        album.setArtist(artistDAO.findBySpotifyId(artistId));
+        album.setArtist(artistRepository.findBySpotifyId(artistId).orElseThrow());
         album.setFetchFlag(true);
         return album;
     }
