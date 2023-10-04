@@ -4,6 +4,7 @@ import com.example.immomio_coding.entities.Album;
 import com.example.immomio_coding.services.AlbumService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -38,5 +39,11 @@ public class AlbumController {
     @PostMapping("/create")
     public Album createAlbum(@RequestBody Album newAlbum) {
         return albumService.createAlbum(newAlbum);
+    }
+
+    @GetMapping("/search")
+    public List<Album> searchAlbums(@RequestParam("query") String query) {
+        System.out.println("Query param albums: " + query);
+        return albumService.searchAlbums(query);
     }
 }

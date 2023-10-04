@@ -5,6 +5,7 @@ import com.example.immomio_coding.entities.Album;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -42,5 +43,9 @@ public class AlbumService {
         Album deletedAlbum = albumDAO.findById(albumId).orElseThrow(InvalidParameterException::new);
         albumDAO.deleteById(albumId);
         return deletedAlbum;
+    }
+
+    public List<Album> searchAlbums(String query) {
+        return albumDAO.searchByContent(query);
     }
 }
