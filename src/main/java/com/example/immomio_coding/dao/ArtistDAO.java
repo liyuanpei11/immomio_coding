@@ -12,7 +12,9 @@ public interface ArtistDAO extends CrudRepository<Artist, UUID> {
     Artist findBySpotifyId(String spotifyId);
 
     @Query(
-            value = "SELECT * FROM Artist WHERE to_tsvector(name || ' ' || spotify_id || ' ' || popularity) @@ to_tsquery(:query)",
+            value = "SELECT * FROM Artist WHERE to_tsvector(" +
+                    "name || ' ' || spotify_id || ' ' || popularity || ' ' || fetch_flag" +
+                    ") @@ to_tsquery(:query)",
             nativeQuery = true)
     List<Artist> searchByContent(@Param("query") String query);
 }

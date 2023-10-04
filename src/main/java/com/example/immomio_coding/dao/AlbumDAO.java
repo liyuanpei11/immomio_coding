@@ -13,7 +13,9 @@ public interface AlbumDAO extends CrudRepository<Album, UUID> {
     Album findBySpotifyId(String spotifyId);
 
     @Query(
-            value = "SELECT * FROM Album WHERE to_tsvector(name || ' ' || spotify_id || ' ' || total_tracks || ' ' || artist_id) @@ to_tsquery(:query)",
+            value = "SELECT * FROM Album WHERE to_tsvector(" +
+                    "name || ' ' || spotify_id || ' ' || total_tracks || ' ' || artist_id || ' ' || fetch_flag" +
+                    ") @@ to_tsquery(:query)",
             nativeQuery = true)
     List<Album> searchByContent(@Param("query") String query);
 }
