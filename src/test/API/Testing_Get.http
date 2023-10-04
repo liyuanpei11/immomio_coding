@@ -1,5 +1,5 @@
 ### new get
-GET http://localhost:8080/artists/43cddacb-0a28-4d08-ae54-d64d3920c20b
+GET http://localhost:8080/artists
 
 ### create new artist
 POST http://localhost:8080/artists/create
@@ -12,3 +12,5 @@ Content-Type: application/json
     "fetchFlag": true
 }
 
+### search query artists
+GET http://localhost:8080/artists/search?query=test
