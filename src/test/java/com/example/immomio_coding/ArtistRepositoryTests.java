@@ -3,9 +3,11 @@ package com.example.immomio_coding;
 
 import com.example.immomio_coding.entities.Artist;
 import com.example.immomio_coding.repositories.ArtistRepository;
+import com.example.immomio_coding.spotify.SpotifyService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -18,10 +20,13 @@ import java.util.UUID;
 @Testcontainers
 @ActiveProfiles("test-containers-flyway")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class ArtistRepositoryTests {
+public class ArtistRepositoryTests {
 
     @Autowired
     private ArtistRepository artistRepository;
+
+    @MockBean
+    private SpotifyService spotifyService;
 
     static UUID uuidTesting;
 
@@ -31,14 +36,16 @@ class ArtistRepositoryTests {
     public void saveArtistTest() {
         Artist artist = Artist.builder()
                 .name("Test Artist")
-                .spotifyId("Test Spotify Id")
+                .spotifyId("123456asdasda789789")
                 .popularity(69)
                 .fetchFlag(false)
                 .build();
 
-        artistRepository.save(artist);
+        Artist savedArtist = artistRepository.save(artist);
 
         Assertions.assertNotNull(artist.getId());
+        Assertions.assertEquals(artist, savedArtist);
+
         uuidTesting = artist.getId();
     }
 
@@ -48,6 +55,10 @@ class ArtistRepositoryTests {
         Artist artist = artistRepository.findById(uuidTesting).orElseThrow();
 
         Assertions.assertEquals(artist.getId(), uuidTesting);
+        Assertions.assertEquals(artist.getName(), "Test Artist");
+        Assertions.assertEquals(artist.getSpotifyId(), "123456asdasda789789");
+        Assertions.assertEquals(artist.getPopularity(), 69);
+        Assertions.assertFalse(artist.isFetchFlag());
     }
 
     @Test
