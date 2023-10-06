@@ -27,8 +27,8 @@ public class ArtistService {
         return artistRepository.save(newArtist);
     }
 
-    public Artist updateArtist(UUID artistUUId, Artist updateArtist) {
-        Artist currentArtist = artistRepository.findById(artistUUId).orElseThrow();
+    public Artist updateArtist(UUID artistUUID, Artist updateArtist) {
+        Artist currentArtist = artistRepository.findById(artistUUID).orElseThrow();
         currentArtist.setName(updateArtist.getName());
         currentArtist.setPopularity(updateArtist.getPopularity());
         currentArtist.setSpotifyId(updateArtist.getSpotifyId());

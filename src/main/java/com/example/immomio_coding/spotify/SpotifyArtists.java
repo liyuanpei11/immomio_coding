@@ -1,11 +1,11 @@
 package com.example.immomio_coding.spotify;
 
-import com.example.immomio_coding.repositories.ArtistRepository;
 import com.example.immomio_coding.entities.Artist;
+import com.example.immomio_coding.repositories.ArtistRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-@Component
+@Service
 public class SpotifyArtists extends SpotifyAPI {
     ArtistRepository artistRepository;
     public SpotifyArtists(ArtistRepository artistRepository) {

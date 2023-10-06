@@ -2,12 +2,12 @@ package com.example.immomio_coding.spotify;
 
 import com.example.immomio_coding.repositories.ArtistRepository;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+@Service
 public class SpotifyService {
     private final SpotifyArtists spotifyArtists;
     private final SpotifyAlbums spotifyAlbums;
