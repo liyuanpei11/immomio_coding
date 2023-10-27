@@ -10,15 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class SpotifyAlbums extends SpotifyAPI {
-    AlbumRepository albumRepository;
-    ArtistRepository artistRepository;
+    final AlbumRepository albumRepository;
+    final ArtistRepository artistRepository;
 
     public SpotifyAlbums(AlbumRepository albumRepository, ArtistRepository artistRepository) {
         this.albumRepository = albumRepository;
@@ -28,22 +26,15 @@ public class SpotifyAlbums extends SpotifyAPI {
     public void fetchSpotifyArtistAlbums(String artistId) {
         String url = String.format("https://api.spotify.com/v1/artists/%s/albums", artistId);
 
-        //TODO: make params better
         String urlTemplate = UriComponentsBuilder.fromHttpUrl(url)
                 .queryParam("include_groups", "album")
                 .encode()
                 .toUriString();
 
-        //TODO: maybe SpringBoot has a function for this
-        if (this.accessToken == null ||
-                ChronoUnit.SECONDS.between(Objects.requireNonNull(this.acquireDateTime), LocalDateTime.now()) >= this.expireTime) {
-            this.generateAccessToken();
-        }
-
-        RestTemplate restTemplate = new RestTemplate();
+        checkAccessToken();
 
         try {
-            ResponseEntity<JsonNode> spotifyData = restTemplate.exchange(
+            ResponseEntity<JsonNode> spotifyData = new RestTemplate().exchange(
                     urlTemplate,
                     HttpMethod.GET,
                     this.httpEntity,

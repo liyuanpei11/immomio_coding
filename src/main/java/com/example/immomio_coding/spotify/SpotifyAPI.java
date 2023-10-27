@@ -10,13 +10,15 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 
 public class SpotifyAPI {
 
     String accessToken;
     LocalDateTime acquireDateTime;
     int expireTime;
-    HttpEntity httpEntity;
+    HttpEntity<String> httpEntity;
 
     void generateAccessToken() {
         String url = "https://accounts.spotify.com/api/token";
@@ -46,6 +48,13 @@ public class SpotifyAPI {
             this.httpEntity = new HttpEntity<>(headers);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    void checkAccessToken() {
+        if (this.accessToken == null ||
+                ChronoUnit.SECONDS.between(Objects.requireNonNull(this.acquireDateTime), LocalDateTime.now()) >= this.expireTime) {
+            this.generateAccessToken();
         }
     }
 }

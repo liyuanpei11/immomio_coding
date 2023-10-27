@@ -9,15 +9,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class SpotifyArtists extends SpotifyAPI {
-    ArtistRepository artistRepository;
+    final ArtistRepository artistRepository;
     public SpotifyArtists(ArtistRepository artistRepository) {
         this.artistRepository = artistRepository;
     }
@@ -25,22 +23,15 @@ public class SpotifyArtists extends SpotifyAPI {
     public void fetchSpotifyArtists(List<String> artistsIdList) {
         String url = "https://api.spotify.com/v1/artists";
 
-        //TODO: make params better
         String urlTemplate = UriComponentsBuilder.fromHttpUrl(url)
                 .queryParam("ids", String.join(",", artistsIdList))
                 .encode()
                 .toUriString();
 
-        //TODO: maybe SpringBoot has a function for this
-        if (this.accessToken == null ||
-                ChronoUnit.SECONDS.between(Objects.requireNonNull(this.acquireDateTime), LocalDateTime.now()) >= this.expireTime) {
-            this.generateAccessToken();
-        }
-
-        RestTemplate restTemplate = new RestTemplate();
+        checkAccessToken();
 
         try {
-            ResponseEntity<JsonNode> spotifyData = restTemplate.exchange(
+            ResponseEntity<JsonNode> spotifyData = new RestTemplate().exchange(
                     urlTemplate,
                     HttpMethod.GET,
                     this.httpEntity,
