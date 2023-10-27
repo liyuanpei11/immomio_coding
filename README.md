@@ -52,6 +52,7 @@ Nach dem Start der Spring Boot Anwendung werden alle 60 Sekunden Daten von 10 In
 Spotify-API heruntergeladen und in die Datenbank gespeichert/aktualisiert.
 
 ## CRUD-Endpoints
+
 ### Artists endpoints
 <details>
 <summary><code>GET</code> <code><b>/</b></code> <code>(get all artists)</code></summary>
@@ -82,6 +83,10 @@ Spotify-API heruntergeladen und in die Datenbank gespeichert/aktualisiert.
 > |------|-----------|-----------|----------------------|
 > | `id` |  required | string    | The id of the artist |
 
+##### Request Body
+
+> The request body must be an object of `de.example.immomio_coding.entities.Artist`
+
 </details>
 
 <details>
@@ -102,6 +107,10 @@ Spotify-API heruntergeladen und in die Datenbank gespeichert/aktualisiert.
 
 > None
 
+##### Request Body
+
+> The request body must be an object of `de.example.immomio_coding.entities.Artist`
+
 </details>
 
 <details>
@@ -118,6 +127,82 @@ Spotify-API heruntergeladen und in die Datenbank gespeichert/aktualisiert.
 > | `query` |  required | string    | string to search |
 
 </details>
+
+### Album endpoints
+<details>
+<summary><code>GET</code> <code><b>/</b></code> <code>(get all albums)</code></summary>
+
+##### Parameters
+
+> None
+
+</details>
+
+<details>
+<summary><code>GET</code> <code><b>/{id}</b></code> <code>(get album by its id)</code></summary>
+
+##### Parameters
+
+> | name |  type     | data type | description          |
+> |------|-----------|-----------|----------------------|
+> | `id` |  required | string    | The id of the artist |
+
+</details>
+
+<details>
+<summary><code>PUT</code> <code><b>/{id}</b></code> <code>(update album by its id)</code></summary>
+
+##### Parameters
+
+> | name |  type     | data type | description          |
+> |------|-----------|-----------|----------------------|
+> | `id` |  required | string    | The id of the artist |
+
+##### Request Body
+
+> The request body must be an object of `de.example.immomio_coding.entities.Album`
+
+</details>
+
+<details>
+<summary><code>DELETE</code> <code><b>/{id}</b></code> <code>(delete album by its id)</code></summary>
+
+##### Parameters
+
+> | name |  type     | data type | description          |
+> |------|-----------|-----------|----------------------|
+> | `id` |  required | string    | The id of the artist |
+
+</details>
+
+<details>
+<summary><code>POST</code> <code><b>/create</b></code> <code>(create a new album)</code></summary>
+
+##### Parameters
+
+> None
+
+##### Request Body
+
+> The request body must be an object of `de.example.immomio_coding.entities.Album` 
+
+</details>
+
+<details>
+<summary><code>GET</code> <code><b>/search</b></code> <code>(search for album)</code></summary>
+
+##### Parameters
+
+> None
+
+##### Query parameters
+
+> | name    |  type     | data type | description      |
+> |---------|-----------|-----------|------------------|
+> | `query` |  required | string    | string to search |
+
+</details>
+
 
 
 
